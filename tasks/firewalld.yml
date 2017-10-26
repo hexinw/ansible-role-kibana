@@ -1,0 +1,13 @@
+---
+
+# NOTE: This playbook *adds* rules.
+# It does not delete existing rules.
+
+- name: Enable firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: Open kibana API port
+  command: firewall-cmd --permanent --add-port=5601/tcp
+
+- name: Bounce firewalld
+  service: name=firewalld state=restarted

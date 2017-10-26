@@ -8,16 +8,37 @@
 - name: Install Kibana.
   package: name=kibana state=present
 
+- name: Create directory
+  file:
+    path: /var/log/kibana
+    state: directory
+    owner: kibana
+    group: kibana
+    mode: 0755
+
+- include: plugins.yml
+  when: kibana_manage_plugins
+
 - name: Ensure Kibana is started and enabled at boot.
   service:
     name: kibana
     state: started
     enabled: yes
 
+- include: firewalld.yml
+  tags:
+      - install
+
+#Create required directories
+#- name: Create Directories
+#  file: path={{ item }} state=directory owner='root' group='root'
+#  with_items:
+#    - "/opt/kibana/config/"
+
 - name: Copy Kibana configuration.
   template:
     src: kibana.yml.j2
-    dest: "/opt/kibana/config/kibana.yml"
+    dest: "/etc/kibana/kibana.yml"
     owner: root
     group: root
     mode: 0644
